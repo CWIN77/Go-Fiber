@@ -1,15 +1,18 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber"
+	// "github.com/gofiber/fiber/middleware/cors"
 )
 
 func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) {
-		c.Send("Hello world!")
+		c.Send("11")
 	})
 
-	app.Listen(3000)
+	log.Fatal(app.Listen(":3000"))
 }

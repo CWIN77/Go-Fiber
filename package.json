@@ -1,0 +1,17 @@
+{
+  "name": "fiber",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.go",
+  "scripts": {
+    "start": "go run main.go",
+    "start:exe": "go run main.exe",
+    "build": "go build main.go",
+    "dev": "air",
+    "dev_set": "go install github.com/cosmtrek/air@latest",
+    "install": "go install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
