@@ -16,24 +16,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func getData() []byte {
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable")
-	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
+func getData(client *mongo.Client) []byte {
 	coll := client.Database("simpleMongo").Collection("Post")
 	title := "Join the MongoDB Community"
 	var result bson.M
-	err = coll.FindOne(context.TODO(), bson.D{{Key: "title", Value: title}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "title", Value: title}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		fmt.Printf("No document was found with the title %s\n", title)
 		return []byte("NoData")
@@ -57,20 +44,36 @@ type Request struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
+type Data struct {
+	Data Request `json:"data"`
+}
+
 func main() {
 	app := fiber.New()
 	envLoad()
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable")
+	}
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
 	middleware(app)
-
-	fmt.Println(os.Getenv("TEST"))
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		data := Request{}
-		json.Unmarshal(getData(), &data)
-		return c.Status(200).JSON(data)
+		json.Unmarshal(getData(client), &data)
+		db := Data{Data: data}
+		return c.Status(200).JSON(db)
 	})
 
-	app.Listen(":3000")
+	app.Listen(":5000") // Elastic Beanstalk에 배포시 5000포트이고 파일이름이 application.go여야한다
 }
 
 func envLoad() {
