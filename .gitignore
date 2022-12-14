@@ -2,4 +2,4 @@ go.sum
 .env
 ./tmp
 main.exe
-.air.torml
+.air.toml
