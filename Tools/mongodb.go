@@ -42,5 +42,6 @@ func Connect(uri string) (client *mongo.Client) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("DB 연결 완료")
 	return
 }
