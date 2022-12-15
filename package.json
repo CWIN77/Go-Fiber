@@ -9,7 +9,8 @@
     "build": "go build main.go",
     "dev": "set ENV_MODE=development && air",
     "set": "air init && go mod init",
-    "install": "go install"
+    "install": "go install",
+    "test": "go test"
   },
   "keywords": [],
   "author": "",

@@ -11,6 +11,7 @@ import (
 	middleware "fiber/Tools"
 	_index "fiber/Tools/Router"
 	_api "fiber/Tools/Router/api"
+	_api_id "fiber/Tools/Router/api/p_id"
 	mongodb "fiber/Tools/mongodb"
 )
 
@@ -31,6 +32,7 @@ func main() {
 	app.Get("/", _index.Get(mongoClient))
 
 	app.Get("/api", _api.Get())
+	app.Get("/api/:id", _api_id.Get())
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
