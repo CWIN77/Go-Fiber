@@ -1,4 +1,4 @@
-module src/fiber
+module fiber
 
 go 1.19
 
@@ -8,8 +8,8 @@ require (
 	github.com/creack/pty v1.1.18 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/fiber/v2 v2.40.1 // indirect
+	github.com/gofiber/helmet/v2 v2.2.22 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect

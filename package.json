@@ -4,11 +4,11 @@
   "description": "",
   "main": "main.go",
   "scripts": {
-    "start": "go run main.go",
+    "start": "set ENV_MODE=production&&go run main.go",
     "start:exe": "go run main.exe",
     "build": "go build main.go",
-    "dev": "air",
-    "dev_set": "go install github.com/cosmtrek/air@latest",
+    "dev": "set ENV_MODE=development && air",
+    "set": "air init && go mod init",
     "install": "go install"
   },
   "keywords": [],
