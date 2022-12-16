@@ -41,3 +41,14 @@ func Connect(uri string) (client *mongo.Client) {
 	}
 	return
 }
+
+func CreateTeam(client *mongo.Client)  {
+	// db.runCommand( { create: "collection", capped: true, size: 64 * 1024 } )
+
+	db := client.Database("dbName")
+	command := bson.D{{Key: "create", Value: "collectionName"}}
+	var result bson.M
+	if err := db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
+		log.Fatal(err)
+	}
+}

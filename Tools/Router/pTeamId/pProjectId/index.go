@@ -1,4 +1,4 @@
-package _api_id
+package _teamId_projectId
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,6 @@ import (
 
 func Get() func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		return c.SendString(c.Params("id"))
+		return c.SendString(c.Params("teamId") + ", " + c.Params("projectId"))
 	}
 }
