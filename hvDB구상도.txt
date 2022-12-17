@@ -10,5 +10,11 @@ Project 콜랙션
  - owner
  - style
  - html
+Component 콜랙션
+ - _id
+ - name
+ - html
+ - style
+ - maker
 
 사용자는 로그인 하면 user를 받아오고 user id값으로 project에서 포함된 데이터를 찾아 가져옴
