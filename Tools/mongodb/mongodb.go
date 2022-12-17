@@ -13,9 +13,9 @@ import (
 )
 
 func GetData(client *mongo.Client) (map[string][]primitive.M, error) {
-	coll := client.Database("simpleMongo").Collection("Post")
+	coll := client.Database("hvData").Collection("user")
 	var result bson.M
-	filter := bson.D{{Key: "title", Value: "Join the MongoDB Community"}}
+	filter := bson.D{{Key: "name", Value: "최우승"}}
 	err := coll.FindOne(context.TODO(), filter).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		fmt.Printf("No document was found with the title")
@@ -40,15 +40,4 @@ func Connect(uri string) (client *mongo.Client) {
 		log.Fatal(err)
 	}
 	return
-}
-
-func CreateTeam(client *mongo.Client)  {
-	// db.runCommand( { create: "collection", capped: true, size: 64 * 1024 } )
-
-	db := client.Database("dbName")
-	command := bson.D{{Key: "create", Value: "collectionName"}}
-	var result bson.M
-	if err := db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
-		log.Fatal(err)
-	}
 }
