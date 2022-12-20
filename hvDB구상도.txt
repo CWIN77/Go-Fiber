@@ -1,20 +1,28 @@
 User 콜랙션
- - _id
- - Name
- - img
- - mail
+  _id
+  name
+  img
+  mail
 Project 콜랙션
- - _id
- - user list
- - project name
- - owner
- - style
- - html
+  _id
+  title
+  owner ("Team_$id"|"User_$id")
+  style
+  html
+  createdAt
+  UpdatedAt
 Component 콜랙션
- - _id
- - name
- - html
- - style
- - maker
+  _id
+  name
+  html
+  style
+  maker (User _id)
+  like
+  createdAt
+  UpdatedAt
+Team 콜랙션
+  _id
+  name
+  member {(User _id):(master|manager|maker|reader)}
+  chat
 
-사용자는 로그인 하면 user를 받아오고 user id값으로 project에서 포함된 데이터를 찾아 가져옴

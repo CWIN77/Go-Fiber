@@ -25,6 +25,18 @@ func GetData(client *mongo.Client) (map[string][]primitive.M, error) {
 	return map[string][]primitive.M{"data": dataArray}, err
 }
 
+func GetUser(userId string)  {
+	
+}
+
+func GetProject(userId string)  {
+	
+}
+
+func GetComponent()  {
+	
+}
+
 func Connect(uri string) (client *mongo.Client) {
 	if uri == "" {
 		log.Fatal("You must set your 'MONGODB_URI' environmental variable.")
