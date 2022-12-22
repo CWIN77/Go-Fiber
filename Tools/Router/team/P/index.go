@@ -1,4 +1,4 @@
-package _team
+package router
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,6 @@ import (
 
 func Get() func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		return c.SendString(c.Params("projectId"))
+		return c.SendString(c.Params("params"))
 	}
 }

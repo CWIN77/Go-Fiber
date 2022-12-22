@@ -1,4 +1,4 @@
-package _index
+package router
 
 import (
 	"fiber/Tools/mongodb"

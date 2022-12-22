@@ -33,10 +33,10 @@ func main() {
 
 	app.Get("/", _index.Get(mongoClient))
 
-	app.Get("/component/:makerId", _component_P.Get())
-	app.Get("/project/:ownerId", _project_P.Get())
-	app.Get("/team/:memberId", _team_P.Get())
-	app.Get("/user/:userId", _user_P.Get())
+	app.Get("/component/:params", _component_P.Get())
+	app.Get("/project/:params", _project_P.Get())
+	app.Get("/team/:params", _team_P.Get())
+	app.Get("/user/:params", _user_P.Get())
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
