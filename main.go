@@ -8,9 +8,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 
-	middleware "fiber/Tools"
 	_index "fiber/Tools/Router"
-	_projectId "fiber/Tools/Router/pProjectId"
+	__component_P "fiber/Tools/Router/_api/_component/P"
+	__project_P "fiber/Tools/Router/_api/_project/P"
+	__team_P "fiber/Tools/Router/_api/_team/P"
+	__user_P "fiber/Tools/Router/_api/_user/P"
+	middleware "fiber/Tools/middleware"
 	"fiber/Tools/mongodb"
 )
 
@@ -30,7 +33,10 @@ func main() {
 
 	app.Get("/", _index.Get(mongoClient))
 
-	app.Get("/:projectId", _projectId.Get())
+	app.Get("/api/component/:makerId", __component_P.Get())
+	app.Get("/api/project/:ownerId", __project_P.Get())
+	app.Get("/api/team/:memberId", __team_P.Get())
+	app.Get("/api/user/:userId", __user_P.Get())
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
