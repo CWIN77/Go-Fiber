@@ -29,14 +29,18 @@ func main() {
 
 	middleware.Setting(app)
 
-	mongoClient := mongodb.Connect(os.Getenv("MONGODB_URI"))
+	if err := mongodb.ConnectDB(os.Getenv("MONGODB_URI")); err != nil {
+		log.Fatal("Error mongoDB connect")
+	}
 
-	app.Get("/", _index.Get(mongoClient))
+	app.Get("/", _index.Get)
 
-	app.Get("/component/:params", _component_P.Get())
-	app.Get("/project/:params", _project_P.Get())
-	app.Get("/team/:params", _team_P.Get())
-	app.Get("/user/:params", _user_P.Get())
+	app.Get("/component/:params", _component_P.Get)
+	app.Get("/project/:params", _project_P.Get)
+	app.Get("/team/:params", _team_P.Get)
+	app.Get("/user/:params", _user_P.Get)
+
+	app.Get("/test", _project_P.Get)
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
