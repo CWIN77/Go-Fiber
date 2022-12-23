@@ -13,7 +13,7 @@ Project 콜랙션
     style
     html
   createdAt
-  UpdatedAt
+  updatedAt
 Component 콜랙션
   _id
   name
@@ -22,7 +22,7 @@ Component 콜랙션
   maker (User _id)
   like
   createdAt
-  UpdatedAt
+  updatedAt
 Team 콜랙션
   _id
   name
