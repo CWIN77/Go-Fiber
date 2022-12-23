@@ -9,6 +9,9 @@ Project 콜랙션
   owner ("Team_$id"|"User_$id")
   style
   html
+  component
+    style
+    html
   createdAt
   UpdatedAt
 Component 콜랙션
