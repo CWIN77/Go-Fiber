@@ -13,6 +13,7 @@ import (
 	_project_P "fiber/Tools/Router/project/P"
 	_team_P "fiber/Tools/Router/team/P"
 	_user_P "fiber/Tools/Router/user/P"
+	_style_P "fiber/Tools/Router/style/P"
 	middleware "fiber/Tools/middleware"
 	"fiber/Tools/mongodb"
 )
@@ -39,6 +40,7 @@ func main() {
 	app.Get("/project/:params", _project_P.Get)
 	app.Get("/team/:params", _team_P.Get)
 	app.Get("/user/:params", _user_P.Get)
+	app.Get("/style/:params", _style_P.Get)
 
 	app.Get("/test", _project_P.Get)
 

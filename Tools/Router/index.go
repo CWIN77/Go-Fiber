@@ -12,14 +12,15 @@ import (
 )
 
 var Get = func(c *fiber.Ctx) error {
-	data, err := getData(mongodb.GetMongoClient())
+	data, err := getData()
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(data)
 }
 
-func getData(client *mongo.Client) (map[string][]primitive.M, error) {
+func getData() (map[string][]primitive.M, error) {
+	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
 	var result bson.M
 	filter := bson.D{{Key: "name", Value: "최우승"}}
