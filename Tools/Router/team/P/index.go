@@ -5,5 +5,6 @@ import (
 )
 
 var Get = func(c *fiber.Ctx) error {
+
 	return c.SendString(c.Params("params"))
 }
