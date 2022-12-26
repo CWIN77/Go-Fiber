@@ -28,5 +28,5 @@ Team 콜랙션
   _id
   name
   member {(User _id):(master|manager|maker|reader)}
-  chat
+  // chat
 
