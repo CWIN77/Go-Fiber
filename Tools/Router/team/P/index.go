@@ -5,8 +5,11 @@ import (
 )
 
 var Get = func(c *fiber.Ctx) error {
-
-	return c.SendString(c.Params("params"))
+	data, err := getData(c.Params("params"))
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(data)
 }
 
 func getData(memberId string) ([]map[string]interface{}, error) {
