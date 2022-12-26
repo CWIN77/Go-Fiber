@@ -12,7 +12,9 @@ var Get = func(c *fiber.Ctx) error {
 func getData(memberId string) ([]map[string]interface{}, error) {
         client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
-	filter := bson.M{"$or": [
+	// 만약 $or가 없다 나오면 {member:{"$or":[...} 
+        // 형식으로 변경함
+        filter := bson.M{"$or": [
                 bson.M{"member.master": memberId}, 
                 bson.M{"member.manager": memberId}, 
                 bson.M{"member.maker": memberId}, 
