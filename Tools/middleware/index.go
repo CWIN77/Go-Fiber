@@ -16,8 +16,6 @@ import (
 
 func Setting(app *fiber.App) {
 	app.Use(helmet.New())
-	app.Use(cors.New())
-	app.Use(csrf.New())
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
 	}))
@@ -25,6 +23,7 @@ func Setting(app *fiber.App) {
 		Weak: true,
 	}))
 	if os.Getenv("ENV_MODE") == "production" {
+		app.Use(csrf.New())
 		app.Use(limiter.New())
 		app.Use(cache.New(cache.Config{
 			Next: func(c *fiber.Ctx) bool {
@@ -33,5 +32,7 @@ func Setting(app *fiber.App) {
 			Expiration:   2 * time.Minute,
 			CacheControl: true,
 		}))
+	}else{
+		app.Use(cors.New())
 	}
 }

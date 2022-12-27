@@ -3,6 +3,7 @@ package _user
 import (
 	"context"
 	"fiber/Tools/mongodb"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,8 +18,20 @@ var Get = func(c *fiber.Ctx) error {
 	return c.Status(200).JSON(data)
 }
 
-var Post = func(c *fiber.Ctx) error  {
-  return c.Send(c.Body())
+type UserData struct {
+	UID  string `json:"uid" xml:"uid" form:"uid"`
+	NAME string `json:"name" xml:"name" form:"name"`
+	IMG  string `json:"img" xml:"img" form:"img"`
+	MAIL string `json:"mail" xml:"mail" form:"mail"`
+}
+
+var Post = func(c *fiber.Ctx) error {
+	p := new(UserData)
+	if err := c.BodyParser(p); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	createData(p)
+	return c.Status(200).JSON([4]string{p.UID, p.NAME, p.IMG, p.MAIL})
 }
 
 func getData(id string) (primitive.M, error) {
@@ -31,6 +44,8 @@ func getData(id string) (primitive.M, error) {
 	return result, err
 }
 
-// func createData() {
-  
-// }
+func createData(userData *UserData) {
+	if userData.IMG != "" && userData.MAIL != "" && userData.NAME != "" && userData.UID != "" {
+		fmt.Println(userData)
+	}
+}
