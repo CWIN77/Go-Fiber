@@ -29,4 +29,3 @@ Team 콜랙션
   name
   member {(User _id):(master|manager|maker|reader)}
   // chat
-
