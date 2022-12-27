@@ -1,4 +1,4 @@
-package _project_P
+package _project
 
 import (
 	"context"
@@ -42,3 +42,4 @@ func getData(owner string) ([]map[string]interface{}, error) {
 	}
 	return dataArray, err
 }
+

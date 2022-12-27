@@ -1,4 +1,4 @@
-package _component_P
+package _component
 
 import (
 	"context"

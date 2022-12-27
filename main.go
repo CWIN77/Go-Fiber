@@ -8,12 +8,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 
-	_index "fiber/Tools/Router"
 	_component "fiber/Tools/Router/component"
-	_project_P "fiber/Tools/Router/project/P"
-	_team_P "fiber/Tools/Router/team/P"
-	_user_P "fiber/Tools/Router/user/P"
-	_style_P "fiber/Tools/Router/style/P"
+	_project "fiber/Tools/Router/project"
+	_style "fiber/Tools/Router/style"
+	_team "fiber/Tools/Router/team"
+	_user "fiber/Tools/Router/user"
 	middleware "fiber/Tools/middleware"
 	"fiber/Tools/mongodb"
 )
@@ -34,15 +33,14 @@ func main() {
 		log.Fatal("Error mongoDB connect")
 	}
 
-	app.Get("/", _index.Get)
-
 	app.Get("/component", _component.Get)
-	app.Get("/project/:params", _project_P.Get)
-	app.Get("/team/:params", _team_P.Get)
-	app.Get("/user/:params", _user_P.Get)
-	app.Get("/style/:params", _style_P.Get)
+	app.Get("/project/:params", _project.Get)
+	app.Get("/team/:params", _team.Get)
 
-	app.Get("/test", _project_P.Get)
+	app.Get("/user/:params", _user.Get)
+	app.Post("/user", _user.Post)
+
+	app.Get("/style/:params", _style.Get)
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application

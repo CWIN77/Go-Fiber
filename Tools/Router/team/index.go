@@ -1,7 +1,14 @@
-package _team_P
+package _team
 
 import (
+	"context"
+	"fiber/Tools/mongodb"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var Get = func(c *fiber.Ctx) error {
@@ -13,16 +20,18 @@ var Get = func(c *fiber.Ctx) error {
 }
 
 func getData(memberId string) ([]map[string]interface{}, error) {
-        client := mongodb.GetMongoClient()
+	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
-	// 만약 $or가 없다 나오면 {member:{"$or":[...} 
-        // 형식으로 변경함
-        filter := bson.M{"$or": [
-                bson.M{"member.master": memberId}, 
-                bson.M{"member.manager": memberId}, 
-                bson.M{"member.maker": memberId}, 
-                bson.M{"member.reader": memberId}
-	]}
+	// 만약 $or가 없다 나오면 {member:{"$or":[...}
+	// 형식으로 변경함
+	filter := bson.M{
+		"$or": [4]interface{}{
+			bson.M{"member.master": memberId},
+			bson.M{"member.manager": memberId},
+			bson.M{"member.maker": memberId},
+			bson.M{"member.reader": memberId},
+		},
+	}
 	opts := options.Find()
 	var err error = nil
 	var cursor *mongo.Cursor
