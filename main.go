@@ -42,6 +42,10 @@ func main() {
 
 	app.Get("/style/:params", _style.Get)
 
+	// app.Get("/test", func(c *fiber.Ctx) error {
+	// 	return c.Status(200).JSON("test")
+	// })
+
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
 	app.Listen(":5000")

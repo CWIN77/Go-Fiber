@@ -22,8 +22,6 @@ var Get = func(c *fiber.Ctx) error {
 func getData(memberId string) ([]map[string]interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
-	// 만약 $or가 없다 나오면 {member:{"$or":[...}
-	// 형식으로 변경함
 	filter := bson.M{
 		"$or": [4]interface{}{
 			bson.M{"member.master": memberId},

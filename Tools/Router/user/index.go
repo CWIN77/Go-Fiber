@@ -3,7 +3,7 @@ package _user
 import (
 	"context"
 	"fiber/Tools/mongodb"
-	"fmt"
+	"reflect"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,10 +12,10 @@ import (
 )
 
 type UserData struct {
-	UID   string `json:"uid" xml:"uid" form:"uid"`
-	NAME  string `json:"name" xml:"name" form:"name"`
-	IMG   string `json:"img" xml:"img" form:"img"`
-	EMAIL string `json:"email" xml:"email" form:"email"`
+	UID   string
+	NAME  string
+	IMG   string
+	EMAIL string
 }
 
 var Get = func(c *fiber.Ctx) error {
@@ -27,12 +27,15 @@ var Get = func(c *fiber.Ctx) error {
 }
 
 var Post = func(c *fiber.Ctx) error {
-	p := new(UserData)
-	if err := c.BodyParser(p); err != nil {
+	p := UserData{}
+	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	if p.IMG == "" || p.EMAIL == "" || p.NAME == "" || p.UID == "" {
-		return c.Status(400).JSON("Please send all user data.")
+	values := reflect.ValueOf(p)
+	for i := 0; i < values.NumField(); i++ {
+		if values.Field(i).String() == "" {
+			return c.Status(400).JSON("Please send all user data.")
+		}
 	}
 	result, err := postData(p)
 	if err != nil {
@@ -51,7 +54,7 @@ func getData(id string) (primitive.M, error) {
 	return result, err
 }
 
-func postData(userData *UserData) (interface{}, error) {
+func postData(userData UserData) (interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
 	userId, _ := primitive.ObjectIDFromHex(userData.UID)
