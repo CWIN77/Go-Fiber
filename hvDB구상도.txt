@@ -6,7 +6,7 @@ User 콜랙션
 Project 콜랙션
   _id
   title
-  owner ("Team_$id"|"User_$id")
+  owner ("team_$id"|"user_$id")
   style
   html
   component

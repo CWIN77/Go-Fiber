@@ -30,17 +30,7 @@ var Put = func(c *fiber.Ctx) error {
 func putData(data PutCompLike) (*mongo.UpdateResult, error) {
 	client := mongodb.GetMongoClient()
 
-	coll := client.Database("hvData").Collection("user")
-	userId, err := primitive.ObjectIDFromHex(data.USER_ID)
-	if err != nil {
-		return nil, err
-	}
-	err = coll.FindOne(context.TODO(), bson.M{"_id": userId}).Decode(bson.M{})
-	if err != nil {
-		return nil, err
-	}
-
-	coll = client.Database("hvData").Collection("component")
+	coll := client.Database("hvData").Collection("component")
 	compId, err := primitive.ObjectIDFromHex(data.COMP_ID)
 	if err != nil {
 		return nil, err

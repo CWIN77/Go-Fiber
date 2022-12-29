@@ -19,6 +19,14 @@ var Get = func(c *fiber.Ctx) error {
 	return c.Status(200).JSON(data)
 }
 
+var Post = func(c *fiber.Ctx) error {
+	data, err := getData(c.Params("params"))
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(data)
+}
+
 func getData(owner string) ([]map[string]interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("project")
@@ -43,3 +51,6 @@ func getData(owner string) ([]map[string]interface{}, error) {
 	return dataArray, err
 }
 
+func postData()  {
+	
+}

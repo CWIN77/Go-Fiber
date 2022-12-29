@@ -34,18 +34,18 @@ func main() {
 		log.Fatal("Error mongoDB connect")
 	}
 
-	app.Get("/component", _component.Get)
-	app.Post("/component", _component.Post)
-	app.Put("/component", _component.Put)
-	app.Put("/component/like", _component_like.Put)
+	go app.Get("/component", _component.Get)
+	go app.Post("/component", _component.Post)
+	go app.Put("/component", _component.Put)
+	go app.Put("/component/like", _component_like.Put)
 
-	app.Get("/project/:params", _project.Get)
-	app.Get("/team/:params", _team.Get)
+	go app.Get("/project/:params", _project.Get)
+	go app.Get("/team/:params", _team.Get)
 
-	app.Get("/user/:params", _user.Get)
-	app.Post("/user", _user.Post)
+	go app.Get("/user/:params", _user.Get)
+	go app.Post("/user", _user.Post)
 
-	app.Get("/style/:params", _style.Get)
+	go app.Get("/style/:params", _style.Get)
 
 	// app.Get("/test", func(c *fiber.Ctx) error {
 	// 	return c.Status(200).JSON("test")
