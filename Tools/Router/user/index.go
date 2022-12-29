@@ -48,16 +48,22 @@ func getData(id string) (primitive.M, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
 	var result bson.M
-	userId, _ := primitive.ObjectIDFromHex(id)
+	userId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 	filter := bson.M{"_id": userId}
-	err := coll.FindOne(context.TODO(), filter).Decode(&result)
+	err = coll.FindOne(context.TODO(), filter).Decode(&result)
 	return result, err
 }
 
 func postData(userData UserData) (interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
-	userId, _ := primitive.ObjectIDFromHex(userData.UID)
+	userId, err := primitive.ObjectIDFromHex(userData.UID)
+	if err != nil {
+		return nil, err
+	}
 	var findData bson.M
 	insertData := bson.M{
 		"name":  userData.NAME,

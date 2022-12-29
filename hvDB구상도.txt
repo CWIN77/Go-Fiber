@@ -21,7 +21,7 @@ Component 콜랙션
   html
   style
   maker (User _id)
-  like
+  like  ([User _id])
   createdAt
   updatedAt
 Team 콜랙션

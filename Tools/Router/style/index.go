@@ -21,8 +21,11 @@ func getData(id string) (primitive.M, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("project")
 	var result bson.M
-	projectId, _ := primitive.ObjectIDFromHex(id)
+	projectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 	filter := bson.M{"_id": projectId}
-	err := coll.FindOne(context.TODO(), filter).Decode(&result)
+	err = coll.FindOne(context.TODO(), filter).Decode(&result)
 	return result, err
 }

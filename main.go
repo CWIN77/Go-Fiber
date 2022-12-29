@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	_component "fiber/Tools/Router/component"
+	_component_like "fiber/Tools/Router/component/like"
 	_project "fiber/Tools/Router/project"
 	_style "fiber/Tools/Router/style"
 	_team "fiber/Tools/Router/team"
@@ -35,6 +36,8 @@ func main() {
 
 	app.Get("/component", _component.Get)
 	app.Post("/component", _component.Post)
+	app.Put("/component", _component.Put)
+	app.Put("/component/like", _component_like.Put)
 
 	app.Get("/project/:params", _project.Get)
 	app.Get("/team/:params", _team.Get)
