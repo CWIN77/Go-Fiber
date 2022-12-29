@@ -17,7 +17,7 @@ Project 콜랙션
 Component 콜랙션
   _id
   name
-  search (componentName(lowerCase) makerName)
+  keyword (componentName(lowerCase) makerName)
   html
   style
   maker (User _id)

@@ -34,6 +34,8 @@ func main() {
 	}
 
 	app.Get("/component", _component.Get)
+	app.Post("/component", _component.Post)
+
 	app.Get("/project/:params", _project.Get)
 	app.Get("/team/:params", _team.Get)
 
