@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UserData struct {
+type TUserData struct {
 	UID   string
 	NAME  string
 	IMG   string
@@ -27,7 +27,7 @@ var Get = func(c *fiber.Ctx) error {
 }
 
 var Post = func(c *fiber.Ctx) error {
-	p := UserData{}
+	p := TUserData{}
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -57,18 +57,18 @@ func getData(id string) (primitive.M, error) {
 	return result, err
 }
 
-func postData(userData UserData) (interface{}, error) {
+func postData(TuserData TUserData) (interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
-	userId, err := primitive.ObjectIDFromHex(userData.UID)
+	userId, err := primitive.ObjectIDFromHex(TuserData.UID)
 	if err != nil {
 		return nil, err
 	}
 	var findData bson.M
 	insertData := bson.M{
-		"name":  userData.NAME,
-		"img":   userData.IMG,
-		"email": userData.EMAIL,
+		"name":  TuserData.NAME,
+		"img":   TuserData.IMG,
+		"email": TuserData.EMAIL,
 		"_id":   userId,
 	}
 	if err := coll.FindOne(context.TODO(), bson.M{"_id": userId}).Decode(&findData); err == mongo.ErrNoDocuments {

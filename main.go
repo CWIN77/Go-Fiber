@@ -37,9 +37,13 @@ func main() {
 	go app.Get("/component", _component.Get)
 	go app.Post("/component", _component.Post)
 	go app.Put("/component", _component.Put)
+	go app.Delete("/component", _component.Delete)
 	go app.Put("/component/like", _component_like.Put)
 
+	go app.Post("/project", _project.Post)
+	go app.Put("/project", _project.Put)
 	go app.Get("/project/:params", _project.Get)
+
 	go app.Get("/team/:params", _team.Get)
 
 	go app.Get("/user/:params", _user.Get)

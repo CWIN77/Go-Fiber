@@ -10,13 +10,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type PutCompLike struct {
+type TPutData struct {
 	COMP_ID string
 	USER_ID string
 }
 
 var Put = func(c *fiber.Ctx) error {
-	p := PutCompLike{}
+	p := TPutData{}
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -27,7 +27,7 @@ var Put = func(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
-func putData(data PutCompLike) (*mongo.UpdateResult, error) {
+func putData(data TPutData) (*mongo.UpdateResult, error) {
 	client := mongodb.GetMongoClient()
 
 	coll := client.Database("hvData").Collection("component")
