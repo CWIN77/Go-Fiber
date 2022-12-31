@@ -42,6 +42,7 @@ func main() {
 
 	go app.Post("/project", _project.Post)
 	go app.Put("/project", _project.Put)
+	go app.Delete("/project", _project.Delete)
 	go app.Get("/project/:params", _project.Get)
 
 	go app.Get("/team/:params", _team.Get)

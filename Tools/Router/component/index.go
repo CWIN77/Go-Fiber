@@ -3,7 +3,6 @@ package _component
 import (
 	"context"
 	"fiber/Tools/mongodb"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -98,7 +97,7 @@ func getData(search string, limit int64, skip int64) ([]map[string]interface{}, 
 	var cursor *mongo.Cursor
 	cursor, err = coll.Find(context.TODO(), filter, opts)
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
 	var results []bson.D
 	err = cursor.All(context.TODO(), &results)
