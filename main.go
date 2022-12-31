@@ -13,6 +13,7 @@ import (
 	_project "fiber/Tools/Router/project"
 	_style "fiber/Tools/Router/style"
 	_team "fiber/Tools/Router/team"
+	_team_member "fiber/Tools/Router/team/member"
 	_user "fiber/Tools/Router/user"
 	middleware "fiber/Tools/middleware"
 	"fiber/Tools/mongodb"
@@ -46,6 +47,10 @@ func main() {
 	go app.Get("/project/:params", _project.Get)
 
 	go app.Get("/team/:params", _team.Get)
+	go app.Post("/team", _team.Post)
+	go app.Delete("/team", _team.Delete)
+	go app.Put("/team", _team.Put)
+	go app.Put("/team/member", _team_member.Put)
 
 	go app.Get("/user/:params", _user.Get)
 	go app.Post("/user", _user.Post)

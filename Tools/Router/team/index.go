@@ -3,7 +3,9 @@ package _team
 import (
 	"context"
 	"fiber/Tools/mongodb"
+	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,12 +13,69 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type TPostData struct {
+	NAME   string
+	MEMBER []map[string]string
+}
+
+type TDeleteData struct {
+	ID     string
+	MASTER string
+}
+
+type TPutData struct {
+	ID   string
+	NAME string
+}
+
 var Get = func(c *fiber.Ctx) error {
 	data, err := getData(c.Params("params"))
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(data)
+}
+
+var Post = func(c *fiber.Ctx) error {
+	p := TPostData{}
+	if err := c.BodyParser(&p); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	values := reflect.ValueOf(p)
+	for i := 0; i < values.NumField(); i++ {
+		if values.Field(i).String() == "" {
+			return c.Status(400).JSON("Please send all user data.")
+		}
+	}
+	result, err := postData(p)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(result)
+}
+
+var Delete = func(c *fiber.Ctx) error {
+	p := TDeleteData{}
+	if err := c.BodyParser(&p); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	result, err := deleteData(p)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(result)
+}
+
+var Put = func(c *fiber.Ctx) error {
+	p := TPutData{}
+	if err := c.BodyParser(&p); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	result, err := putData(p)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(result)
 }
 
 func getData(memberId string) ([]interface{}, error) {
@@ -70,6 +129,7 @@ func getData(memberId string) ([]interface{}, error) {
 			}
 		}
 	}
+	fmt.Println(memberList)
 	filter = bson.M{"$or": memberList}
 	cursor, err = coll.Find(context.TODO(), filter)
 	if err != nil {
@@ -95,7 +155,6 @@ func getData(memberId string) ([]interface{}, error) {
 						for _, memberValue := range memberResults {
 							if memberValue.Map()["_id"] == id {
 								memberClass := values.Index(i).Interface().(primitive.E).Key
-								// fmt.Println(memberValue.Map())
 								newMemberList = append(newMemberList, map[string]interface{}{memberClass: memberValue.Map()})
 							}
 						}
@@ -109,4 +168,48 @@ func getData(memberId string) ([]interface{}, error) {
 		newTeamList = append(newTeamList, newTeam)
 	}
 	return newTeamList, err
+}
+
+func postData(data TPostData) (*mongo.InsertOneResult, error) {
+	client := mongodb.GetMongoClient()
+	coll := client.Database("hvData").Collection("team")
+	insertData := bson.M{
+		"name":   data.NAME,
+		"member": data.MEMBER,
+	}
+	result, err := coll.InsertOne(context.TODO(), insertData)
+	return result, err
+}
+
+func deleteData(data TDeleteData) (*mongo.DeleteResult, error) {
+	client := mongodb.GetMongoClient()
+	coll := client.Database("hvData").Collection("team")
+	id, err := primitive.ObjectIDFromHex(data.ID)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"$and": [2]primitive.M{bson.M{"_id": id}, bson.M{"member.master": data.MASTER}}}
+	result, err := coll.DeleteOne(context.TODO(), filter)
+	return result, err
+}
+
+func putData(data TPutData) (*mongo.UpdateResult, error) {
+	client := mongodb.GetMongoClient()
+	coll := client.Database("hvData").Collection("team")
+	updateData := bson.M{}
+	values := reflect.ValueOf(data)
+	for i := 0; i < values.NumField(); i++ {
+		dataName := strings.ToLower(values.Type().Field(i).Name)
+		if values.Field(i).Interface() != "" && dataName != "id" {
+			updateData[dataName] = values.Field(i).Interface()
+		}
+	}
+	id, err := primitive.ObjectIDFromHex(data.ID)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.D{{Key: "_id", Value: id}}
+	update := bson.M{"$set": updateData}
+	updateResult, err := coll.UpdateOne(context.TODO(), filter, update)
+	return updateResult, err
 }

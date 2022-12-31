@@ -126,7 +126,7 @@ func putData(data TPutData) (*mongo.UpdateResult, error) {
 	values := reflect.ValueOf(data)
 	for i := 0; i < values.NumField(); i++ {
 		dataName := strings.ToLower(values.Type().Field(i).Name)
-		if values.Field(i).Interface() != "" || dataName != "id" {
+		if values.Field(i).Interface() != "" && dataName != "id" {
 			updateData[dataName] = values.Field(i).Interface()
 		}
 	}

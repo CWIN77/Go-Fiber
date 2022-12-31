@@ -28,5 +28,5 @@ Component 콜랙션
 Team 콜랙션
   _id
   name
-  member {(User _id):(master|manager|maker|reader)}
+  member {(master|manager|maker|reader) : (User _id)}
   // chat
