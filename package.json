@@ -10,7 +10,8 @@
     "dev": "set ENV_MODE=development&&air",
     "set": "air init && go mod init",
     "install": "go install",
-    "test": "go test"
+    "test": "go test",
+    "zip": "ren main.go application.go && zip -r application.zip Tools application.go .env go.mod go.sum && ren application.go main.go"
   },
   "keywords": [],
   "author": "",
