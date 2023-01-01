@@ -3,7 +3,6 @@ package _team
 import (
 	"context"
 	"fiber/Tools/mongodb"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -82,7 +81,7 @@ func getData(memberId string) ([]interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
 	filter := bson.M{
-		"$or": [4]interface{}{
+		"$or": [4]primitive.M{
 			bson.M{"member.master": memberId},
 			bson.M{"member.manager": memberId},
 			bson.M{"member.maker": memberId},
@@ -129,7 +128,6 @@ func getData(memberId string) ([]interface{}, error) {
 			}
 		}
 	}
-	fmt.Println(memberList)
 	filter = bson.M{"$or": memberList}
 	cursor, err = coll.Find(context.TODO(), filter)
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -56,6 +57,15 @@ func main() {
 	go app.Post("/user", _user.Post)
 
 	go app.Get("/style/:params", _style.Get)
+
+	go app.Get("/testapi", func(c *fiber.Ctx) error {
+		res, err := http.Get("http://127.0.0.1:5000/component")
+		if err != nil {
+			return c.Status(400).JSON("Fetch error")
+		}
+		
+		return c.Status(200).JSON("OK")
+	})
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application

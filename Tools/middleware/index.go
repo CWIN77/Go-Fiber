@@ -32,7 +32,17 @@ func Setting(app *fiber.App) {
 			Expiration:   2 * time.Minute,
 			CacheControl: true,
 		}))
-	}else{
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "https://html-visualize.vercel.app",
+			AllowHeaders: "Origin, Content-Type, Accept",
+			AllowMethods: "POST,PUT,DELETE",
+		}))
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "*",
+			AllowMethods: "GET",
+			AllowHeaders: "Origin, Content-Type, Accept",
+		}))
+	} else {
 		app.Use(cors.New())
 	}
 }

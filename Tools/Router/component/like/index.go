@@ -35,13 +35,24 @@ func putData(data TPutData) (*mongo.UpdateResult, error) {
 	if err != nil {
 		return nil, err
 	}
+	var result map[string]interface{}
 	filter := bson.M{"_id": compId}
-	update := bson.M{"$pull": bson.M{"like": bson.M{"$eq": data.USER_ID}}}
-	result, err := coll.UpdateOne(context.TODO(), filter, update)
-	if result.ModifiedCount == 0 {
-		update := bson.M{"$push": bson.M{"like": data.USER_ID}}
-		result, err := coll.UpdateOne(context.TODO(), filter, update)
-		return result, err
+	err = coll.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+	newLikeList := []string{data.USER_ID}
+	for _, v := range result["like"].(primitive.A) {
+		if v.(string) == data.USER_ID {
+			newLikeList = newLikeList[1:]
+		} else {
+			newLikeList = append(newLikeList, v.(string))
+		}
+	}
+	update := bson.M{
+		"like":      newLikeList,
+		"likeCount": len(newLikeList),
+	}
+	updateResult, err := coll.UpdateOne(context.TODO(), filter, bson.M{"$set": update})
+	return updateResult, err
 }
