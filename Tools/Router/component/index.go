@@ -1,10 +1,16 @@
 package _component
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fiber/Tools/mongodb"
 	"fmt"
+	"io/ioutil"
+	"math/rand"
+	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,12 +20,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-type TGetData struct {
-	keyword string
-	limit   int64
-	skip    int64
-}
 
 type TPostData struct { // * Create
 	NAME  string
@@ -41,11 +41,11 @@ type TDeleteData struct { // * Delete
 }
 
 var Get = func(c *fiber.Ctx) error {
-	p := TGetData{}
-	if err := c.BodyParser(&p); err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
-	data, err := getData(p.keyword, p.limit, p.skip)
+	keyword := strings.ToLower(c.Query("keyword"))
+	limit, _ := strconv.ParseInt(c.Query("limit"), 10, 32)
+	skip, _ := strconv.ParseInt(c.Query("skip"), 10, 32)
+	data, err := getData(keyword, limit, skip)
+
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -75,7 +75,6 @@ var Put = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	fmt.Println(p)
 	result, err := putData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -93,6 +92,121 @@ var Delete = func(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(result)
+}
+
+var Test = func() string {
+	const URL = "http://127.0.0.1:5000/component"
+	postData := map[string]interface{}{
+		"name":  strconv.Itoa(rand.Int()),
+		"html":  strconv.Itoa(rand.Int()),
+		"style": strconv.Itoa(rand.Int()),
+		"maker": strconv.Itoa(rand.Int()),
+	}
+	pbytes, _ := json.Marshal(postData)
+	buff := bytes.NewBuffer(pbytes)
+
+	req, err := http.NewRequest("POST", URL, buff)
+	if err != nil {
+		return err.Error()
+	}
+	req.Header.Add("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err.Error()
+	}
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	var postResult map[string]interface{}
+	if err := json.Unmarshal(respBody, &postResult); err != nil {
+		return err.Error()
+	}
+
+	insertedID := postResult["InsertedID"]
+	if insertedID == "" || insertedID == nil {
+		return "/component POST error"
+	}
+
+	putData := map[string]interface{}{
+		"name":  strconv.Itoa(rand.Int()),
+		"html":  strconv.Itoa(rand.Int()),
+		"style": strconv.Itoa(rand.Int()),
+		"id":    insertedID,
+	}
+	pbytes, _ = json.Marshal(putData)
+	buff = bytes.NewBuffer(pbytes)
+
+	req, err = http.NewRequest("PUT", URL, buff)
+	if err != nil {
+		return err.Error()
+	}
+	req.Header.Add("Content-Type", "application/json")
+	client = &http.Client{}
+	resp, err = client.Do(req)
+	if err != nil {
+		return err.Error()
+	}
+
+	respBody, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	var putResult map[string]interface{}
+	if err := json.Unmarshal(respBody, &putResult); err != nil {
+		return err.Error()
+	}
+	if putResult["ModifiedCount"] == nil || putResult["ModifiedCount"].(float64) != 1 {
+		return "/component PUT error"
+	}
+	resp, err = http.Get(URL + "?keyword=" + putData["name"].(string) + "&limit=0&skip=0")
+	fmt.Println(URL + "?keyword=" + putData["name"].(string) + "&limit=0&skip=0")
+	if err != nil {
+		return err.Error()
+	}
+	respBody, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	var getResult []map[string]interface{}
+	if err := json.Unmarshal(respBody, &getResult); err != nil {
+		return err.Error()
+	}
+	if getResult[0]["_id"].(string) != insertedID {
+		return "/component GET error"
+	}
+
+	deleteData := map[string]interface{}{
+		"id":    getResult[0]["_id"],
+		"maker": getResult[0]["maker"],
+	}
+	pbytes, _ = json.Marshal(deleteData)
+	buff = bytes.NewBuffer(pbytes)
+
+	req, err = http.NewRequest("DELETE", URL, buff)
+	if err != nil {
+		return err.Error()
+	}
+	req.Header.Add("Content-Type", "application/json")
+	resp, err = client.Do(req)
+	if err != nil {
+		return err.Error()
+	}
+
+	respBody, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	var deleteResult map[string]interface{}
+	if err := json.Unmarshal(respBody, &deleteResult); err != nil {
+		return err.Error()
+	}
+	if deleteResult["DeletedCount"] == nil || deleteResult["DeletedCount"].(float64) != 1 {
+		return "/component DELETE error"
+	}
+	return "OK: /component test"
 }
 
 func getData(keyword string, limit int64, skip int64) ([]map[string]interface{}, error) {
