@@ -59,7 +59,9 @@ func main() {
 
 	app.Get("/style/:params", _style.Get)
 
-	app.Get("/test", _test.Test)
+	if os.Getenv("ENV_MODE") == "development" {
+		app.Get("/test", _test.Test)
+	}
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
