@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -31,14 +32,10 @@ func main() {
 	})
 
 	middleware.Setting(app)
-
+	fmt.Println(mongodb.GetMongoClient())
 	if err := mongodb.ConnectDB(os.Getenv("MONGODB_URI")); err != nil {
 		log.Fatal("Error mongoDB connect")
 	}
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Status(200).JSON("Home")
-	})
 
 	app.Get("/component", _component.Get)
 	app.Post("/component", _component.Post)

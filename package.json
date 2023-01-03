@@ -5,7 +5,7 @@
   "main": "main.go",
   "scripts": {
     "start": "go run main.go",
-    "start:exe": "go run main.exe",
+    "exe": "main.exe",
     "build": "go build main.go",
     "dev": "set ENV_MODE=development&&air",
     "set": "air init && go mod init",

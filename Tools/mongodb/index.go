@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var mongoClient *mongo.Client
+var mongoClient *mongo.Client = nil
 
 func GetMongoClient() *mongo.Client { return mongoClient }
 
