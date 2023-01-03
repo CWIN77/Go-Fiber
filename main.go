@@ -14,6 +14,7 @@ import (
 	_style "fiber/Tools/Router/style"
 	_team "fiber/Tools/Router/team"
 	_team_member "fiber/Tools/Router/team/member"
+	_test "fiber/Tools/Router/test"
 	_user "fiber/Tools/Router/user"
 	middleware "fiber/Tools/middleware"
 	"fiber/Tools/mongodb"
@@ -57,9 +58,7 @@ func main() {
 
 	go app.Get("/style/:params", _style.Get)
 
-	go app.Get("/testapi", func(c *fiber.Ctx) error {
-		return c.Status(200).JSON(_component.Test())
-	})
+	go app.Get("/test", _test.Test)
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application

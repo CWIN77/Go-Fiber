@@ -3,7 +3,6 @@ package _team_member
 import (
 	"context"
 	"fiber/Tools/mongodb"
-	"reflect"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +12,7 @@ import (
 
 type TPutData struct {
 	ID     string
-	MEMBER string
+	MEMBER map[string]string
 }
 
 var Put = func(c *fiber.Ctx) error {
@@ -21,14 +20,14 @@ var Put = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	result, err := putData(p)
+	result, err := CallPutData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }
 
-func putData(data TPutData) (*mongo.UpdateResult, error) {
+func CallPutData(data TPutData) (*mongo.UpdateResult, error) {
 	client := mongodb.GetMongoClient()
 
 	coll := client.Database("hvData").Collection("team")
@@ -42,19 +41,29 @@ func putData(data TPutData) (*mongo.UpdateResult, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	newMemberList := map[string]string{}
-	for i, v := range result {
-		if i == "member" {
-			values := reflect.ValueOf(v)
-			for k, v := range values.Interface().(primitive.M) {
-				if data.MEMBER != v {
-					newMemberList[k] = v.(string)
-				}
+	for key1, value1 := range data.MEMBER {
+		inMember := false
+		for key2 := range result["member"].(primitive.M) {
+			if key1 == key2 {
+				inMember = true
 			}
 		}
+		if !inMember {
+			newMemberList[key1] = value1
+		}
 	}
-
+	for key1, value1 := range result["member"].(primitive.M) {
+		inMember := false
+		for key2 := range data.MEMBER {
+			if key1 == key2 {
+				inMember = true
+			}
+		}
+		if !inMember {
+			newMemberList[key1] = value1.(string)
+		}
+	}
 	id, err := primitive.ObjectIDFromHex(data.ID)
 	if err != nil {
 		return nil, err

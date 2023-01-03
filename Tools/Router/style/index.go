@@ -10,14 +10,14 @@ import (
 )
 
 var Get = func(c *fiber.Ctx) error {
-	data, err := getData(c.Params("params"))
+	data, err := CallGetData(c.Params("params"))
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(data["style"])
 }
 
-func getData(id string) (primitive.M, error) {
+func CallGetData(id string) (primitive.M, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("project")
 	var result bson.M

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fiber/Tools/mongodb"
 	"reflect"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,7 +13,7 @@ import (
 
 type TPostData struct {
 	NAME   string
-	MEMBER []map[string]string
+	MEMBER map[string]string
 }
 
 type TDeleteData struct {
@@ -27,8 +26,17 @@ type TPutData struct {
 	NAME string
 }
 
+type CustomError struct {
+	Code    string
+	Message string
+}
+
+func (e *CustomError) Error() string {
+	return e.Code + ", " + e.Message
+}
+
 var Get = func(c *fiber.Ctx) error {
-	data, err := getData(c.Params("params"))
+	data, err := CallGetData(c.Params("params"))
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -46,7 +54,7 @@ var Post = func(c *fiber.Ctx) error {
 			return c.Status(400).JSON("Please send all user data.")
 		}
 	}
-	result, err := postData(p)
+	result, err := CallPostData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -58,7 +66,7 @@ var Delete = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	result, err := deleteData(p)
+	result, err := CallDeleteData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -70,22 +78,22 @@ var Put = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	result, err := putData(p)
+	result, err := CallPutData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }
 
-func getData(memberId string) ([]interface{}, error) {
+func CallGetData(memberId string) ([]map[string]interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
 	filter := bson.M{
 		"$or": [4]primitive.M{
-			bson.M{"member.master": memberId},
-			bson.M{"member.manager": memberId},
-			bson.M{"member.maker": memberId},
-			bson.M{"member.reader": memberId},
+			bson.M{"member." + memberId: "master"},
+			bson.M{"member." + memberId: "manager"},
+			bson.M{"member." + memberId: "maker"},
+			bson.M{"member." + memberId: "reader"},
 		},
 	}
 	var cursor *mongo.Cursor
@@ -93,73 +101,59 @@ func getData(memberId string) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var teamResults []bson.D
+	var teamResults []map[string]interface{}
 	err = cursor.All(context.TODO(), &teamResults)
 	if err != nil {
 		return nil, err
 	}
 
 	coll = client.Database("hvData").Collection("user")
-	var memberList []interface{}
-	for _, result := range teamResults {
-		values := reflect.ValueOf(result[0].Value)
-		for i, v := range result {
-			if v.Key == "member" {
-				values = reflect.ValueOf(result[i].Value)
-				break
-			}
-		}
-		for i := 0; i < values.Len(); i++ {
-			value := values.Index(i).Interface().(primitive.E).Value.(string)
-			if value != memberId {
-				inMember := false
-				for _, memberListValue := range memberList {
-					if value == memberListValue {
-						inMember = true
-					}
-				}
-				if !inMember {
-					id, err := primitive.ObjectIDFromHex(value)
-					if err != nil {
-						return nil, err
-					}
-					memberList = append(memberList, bson.M{"_id": id})
+	memberList := []map[string]interface{}{}
+	for _, v := range teamResults {
+		for l := range v["member"].(map[string]interface{}) {
+			existMember := false
+			for _, x := range memberList {
+				if x["_id"].(primitive.ObjectID).Hex() == l {
+					existMember = true
 				}
 			}
+			if !existMember {
+				objID, err := primitive.ObjectIDFromHex(l)
+				if err != nil {
+					return nil, err
+				}
+				memberList = append(memberList, map[string]interface{}{"_id": objID})
+			}
 		}
+	}
+	if len(memberList) == 0 {
+		return nil, &CustomError{Code: "C001", Message: "Cannot found member."}
 	}
 	filter = bson.M{"$or": memberList}
 	cursor, err = coll.Find(context.TODO(), filter)
 	if err != nil {
 		return nil, err
 	}
-	var memberResults []bson.D
+	var memberResults []map[string]interface{}
 	err = cursor.All(context.TODO(), &memberResults)
 
-	var newTeamList []interface{}
+	var newTeamList []map[string]interface{}
 	for _, result := range teamResults {
-		newTeam := make(map[string]interface{})
-		newMemberList := []interface{}{}
-		for i, v := range result {
-			if v.Key == "member" {
-				values := reflect.ValueOf(result[i].Value)
-				for i := 0; i < values.Len(); i++ {
-					value := values.Index(i).Interface().(primitive.E).Value.(string)
-					id, err := primitive.ObjectIDFromHex(value)
-					if err != nil {
-						return nil, err
-					}
-					if value != memberId {
-						for _, memberValue := range memberResults {
-							if memberValue.Map()["_id"] == id {
-								memberClass := values.Index(i).Interface().(primitive.E).Key
-								newMemberList = append(newMemberList, map[string]interface{}{memberClass: memberValue.Map()})
-							}
+		newTeam := map[string]interface{}{}
+		newMemberList := []map[string]interface{}{}
+		for k, v := range result {
+			if k == "member" {
+				for l, w := range v.(map[string]interface{}) {
+					for _, x := range memberResults {
+						if l == x["_id"].(primitive.ObjectID).Hex() {
+							newMember := x
+							newMember["role"] = w.(string)
+							newMemberList = append(newMemberList, newMember)
 						}
 					}
 				}
 			} else {
-				newTeam[v.Key] = v.Value
+				newTeam[k] = v
 			}
 		}
 		newTeam["member"] = newMemberList
@@ -168,7 +162,7 @@ func getData(memberId string) ([]interface{}, error) {
 	return newTeamList, err
 }
 
-func postData(data TPostData) (*mongo.InsertOneResult, error) {
+func CallPostData(data TPostData) (*mongo.InsertOneResult, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
 	insertData := bson.M{
@@ -179,29 +173,22 @@ func postData(data TPostData) (*mongo.InsertOneResult, error) {
 	return result, err
 }
 
-func deleteData(data TDeleteData) (*mongo.DeleteResult, error) {
+func CallDeleteData(data TDeleteData) (*mongo.DeleteResult, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
 	id, err := primitive.ObjectIDFromHex(data.ID)
 	if err != nil {
 		return nil, err
 	}
-	filter := bson.M{"$and": [2]primitive.M{bson.M{"_id": id}, bson.M{"member.master": data.MASTER}}}
+	filter := bson.M{"$and": [2]primitive.M{bson.M{"_id": id}, bson.M{"member." + data.MASTER: "master"}}}
 	result, err := coll.DeleteOne(context.TODO(), filter)
 	return result, err
 }
 
-func putData(data TPutData) (*mongo.UpdateResult, error) {
+func CallPutData(data TPutData) (*mongo.UpdateResult, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("team")
-	updateData := bson.M{}
-	values := reflect.ValueOf(data)
-	for i := 0; i < values.NumField(); i++ {
-		dataName := strings.ToLower(values.Type().Field(i).Name)
-		if values.Field(i).Interface() != "" && dataName != "id" {
-			updateData[dataName] = values.Field(i).Interface()
-		}
-	}
+	updateData := bson.M{"name": data.NAME}
 	id, err := primitive.ObjectIDFromHex(data.ID)
 	if err != nil {
 		return nil, err

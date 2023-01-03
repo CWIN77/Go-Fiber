@@ -20,14 +20,14 @@ var Put = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	result, err := putData(p)
+	result, err := CallPutData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }
 
-func putData(data TPutData) (*mongo.UpdateResult, error) {
+func CallPutData(data TPutData) (*mongo.UpdateResult, error) {
 	client := mongodb.GetMongoClient()
 
 	coll := client.Database("hvData").Collection("component")

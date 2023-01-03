@@ -19,7 +19,7 @@ type TUserData struct {
 }
 
 var Get = func(c *fiber.Ctx) error {
-	data, err := getData(c.Params("params"))
+	data, err := CallGetData(c.Params("params"))
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -37,14 +37,14 @@ var Post = func(c *fiber.Ctx) error {
 			return c.Status(400).JSON("Please send all user data.")
 		}
 	}
-	result, err := postData(p)
+	result, err := CallPostData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }
 
-func getData(id string) (primitive.M, error) {
+func CallGetData(id string) (primitive.M, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
 	var result bson.M
@@ -57,7 +57,7 @@ func getData(id string) (primitive.M, error) {
 	return result, err
 }
 
-func postData(TuserData TUserData) (interface{}, error) {
+func CallPostData(TuserData TUserData) (interface{}, error) {
 	client := mongodb.GetMongoClient()
 	coll := client.Database("hvData").Collection("user")
 	userId, err := primitive.ObjectIDFromHex(TuserData.UID)
