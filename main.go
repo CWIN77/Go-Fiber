@@ -36,29 +36,33 @@ func main() {
 		log.Fatal("Error mongoDB connect")
 	}
 
-	go app.Get("/component", _component.Get)
-	go app.Post("/component", _component.Post)
-	go app.Put("/component", _component.Put)
-	go app.Delete("/component", _component.Delete)
-	go app.Put("/component/like", _component_like.Put)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(200).JSON("Home")
+	})
 
-	go app.Post("/project", _project.Post)
-	go app.Put("/project", _project.Put)
-	go app.Delete("/project", _project.Delete)
-	go app.Get("/project/:params", _project.Get)
+	app.Get("/component", _component.Get)
+	app.Post("/component", _component.Post)
+	app.Put("/component", _component.Put)
+	app.Delete("/component", _component.Delete)
+	app.Put("/component/like", _component_like.Put)
 
-	go app.Get("/team/:params", _team.Get)
-	go app.Post("/team", _team.Post)
-	go app.Delete("/team", _team.Delete)
-	go app.Put("/team", _team.Put)
-	go app.Put("/team/member", _team_member.Put)
+	app.Post("/project", _project.Post)
+	app.Put("/project", _project.Put)
+	app.Delete("/project", _project.Delete)
+	app.Get("/project/:params", _project.Get)
 
-	go app.Get("/user/:params", _user.Get)
-	go app.Post("/user", _user.Post)
+	app.Get("/team/:params", _team.Get)
+	app.Post("/team", _team.Post)
+	app.Delete("/team", _team.Delete)
+	app.Put("/team", _team.Put)
+	app.Put("/team/member", _team_member.Put)
 
-	go app.Get("/style/:params", _style.Get)
+	app.Get("/user/:params", _user.Get)
+	app.Post("/user", _user.Post)
 
-	go app.Get("/test", _test.Test)
+	app.Get("/style/:params", _style.Get)
+
+	app.Get("/test", _test.Test)
 
 	// Elastic Beanstalk Deploy Port : 5000
 	// Elastic Beanstalk Main Name : application
