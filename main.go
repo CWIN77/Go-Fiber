@@ -8,10 +8,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	_component "fiber/Tools/Router/component"
 	_component_like "fiber/Tools/Router/component/like"
 	_project "fiber/Tools/Router/project"
+	_project_component "fiber/Tools/Router/project/component"
 	_style "fiber/Tools/Router/style"
 	_team "fiber/Tools/Router/team"
 	_team_member "fiber/Tools/Router/team/member"
@@ -32,10 +34,11 @@ func main() {
 	})
 
 	middleware.Setting(app)
-	fmt.Println(mongodb.GetMongoClient())
+
 	if err := mongodb.ConnectDB(os.Getenv("MONGODB_URI")); err != nil {
 		log.Fatal("Error mongoDB connect")
 	}
+	fmt.Println(primitive.NewObjectID().Hex())
 
 	app.Get("/component", _component.Get)
 	app.Post("/component", _component.Post)
@@ -47,6 +50,8 @@ func main() {
 	app.Put("/project", _project.Put)
 	app.Delete("/project", _project.Delete)
 	app.Get("/project/:params", _project.Get)
+	app.Put("/project/component", _project_component.Put)
+	app.Delete("/project/component", _project_component.Delete)
 
 	app.Get("/team/:params", _team.Get)
 	app.Post("/team", _team.Post)

@@ -4,6 +4,7 @@ import (
 	_component "fiber/Tools/Router/component"
 	_component_like "fiber/Tools/Router/component/like"
 	_project "fiber/Tools/Router/project"
+	_project_component "fiber/Tools/Router/project/component"
 	_team "fiber/Tools/Router/team"
 	_team_member "fiber/Tools/Router/team/member"
 	"math/rand"
@@ -52,11 +53,10 @@ func TestProject() error {
 		return &CustomError{Message: "Cannot create project."}
 	}
 	putData := _project.TPutData{
-		ID:        insertedID,
-		TITLE:     strconv.Itoa(rand.Int()),
-		STYLE:     strconv.Itoa(rand.Int()),
-		HTML:      strconv.Itoa(rand.Int()),
-		COMPONENT: []map[string]string{}, // TODO: component를 가져오는 api를 따로 나누기
+		ID:    insertedID,
+		TITLE: strconv.Itoa(rand.Int()),
+		STYLE: strconv.Itoa(rand.Int()),
+		HTML:  strconv.Itoa(rand.Int()),
 	}
 	putResult, err := _project.CallPutData(putData)
 	if err != nil {
@@ -64,6 +64,20 @@ func TestProject() error {
 	} else if putResult.ModifiedCount != 1 {
 		return &CustomError{Message: "Cannot update project."}
 	}
+
+	putComponentData := _project_component.TPutData{
+		ID:    insertedID,
+		NAME:  strconv.Itoa(rand.Int()),
+		STYLE: strconv.Itoa(rand.Int()),
+		HTML:  strconv.Itoa(rand.Int()),
+	}
+	putResult, err = _project_component.CallPutData(putComponentData)
+	if err != nil {
+		return err
+	} else if putResult.ModifiedCount != 1 {
+		return &CustomError{Message: "Cannot update project component."}
+	}
+
 	getResult, err := _project.CallGetData(postData.OWNER)
 	if err != nil {
 		return err

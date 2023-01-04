@@ -27,11 +27,10 @@ type TDeleteData struct {
 }
 
 type TPutData struct {
-	ID        string
-	TITLE     string
-	STYLE     string
-	HTML      string
-	COMPONENT []map[string]string
+	ID    string
+	TITLE string
+	STYLE string
+	HTML  string
 }
 
 var Get = func(c *fiber.Ctx) error {
@@ -47,6 +46,12 @@ var Post = func(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	values := reflect.ValueOf(p)
+	for i := 0; i < values.NumField(); i++ {
+		if values.Field(i).String() == "" {
+			return c.Status(400).JSON("Please send all require data.")
+		}
+	}
 	data, err := CallPostData(p)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -58,6 +63,12 @@ var Delete = func(c *fiber.Ctx) error {
 	p := TDeleteData{}
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
+	}
+	values := reflect.ValueOf(p)
+	for i := 0; i < values.NumField(); i++ {
+		if values.Field(i).String() == "" {
+			return c.Status(400).JSON("Please send all require data.")
+		}
 	}
 	result, err := CallDeleteData(p)
 	if err != nil {
@@ -83,9 +94,7 @@ func CallGetData(owner string) ([]map[string]interface{}, error) {
 	coll := client.Database("hvData").Collection("project")
 	filter := bson.M{"owner": owner}
 	opts := options.Find().SetSort(bson.M{"updatedAt": -1})
-	var err error = nil
-	var cursor *mongo.Cursor
-	cursor, err = coll.Find(context.TODO(), filter, opts)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +119,7 @@ func CallPostData(p TPostData) (*mongo.InsertOneResult, error) {
 		"owner":     p.OWNER,
 		"style":     p.STYLE,
 		"html":      p.HTML,
-		"component": [0]string{},
+		"component": [0]map[string]string{},
 		"createdAt": time.Now(),
 		"updatedAt": time.Now(),
 	}

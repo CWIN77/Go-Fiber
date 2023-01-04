@@ -54,7 +54,7 @@ var Post = func(c *fiber.Ctx) error {
 	values := reflect.ValueOf(p)
 	for i := 0; i < values.NumField(); i++ {
 		if values.Field(i).String() == "" {
-			return c.Status(400).JSON("Please send all user data.")
+			return c.Status(400).JSON("Please send all require data.")
 		}
 	}
 	result, err := CallPostData(p)
@@ -80,6 +80,12 @@ var Delete = func(c *fiber.Ctx) error {
 	p := TDeleteData{}
 	if err := c.BodyParser(&p); err != nil {
 		return c.Status(400).JSON(err.Error())
+	}
+	values := reflect.ValueOf(p)
+	for i := 0; i < values.NumField(); i++ {
+		if values.Field(i).String() == "" {
+			return c.Status(400).JSON("Please send all require data.")
+		}
 	}
 	result, err := CallDeleteData(p)
 	if err != nil {

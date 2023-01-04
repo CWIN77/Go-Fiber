@@ -10,9 +10,10 @@ Project 콜랙션
   style
   html
   component
-    name
-    style
-    html
+    id
+      name
+      style
+      html
   createdAt
   updatedAt
 Component 콜랙션
