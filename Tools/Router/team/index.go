@@ -2,6 +2,7 @@ package _team
 
 import (
 	"context"
+	"errors"
 	"fiber/Tools/mongodb"
 	"reflect"
 
@@ -24,15 +25,6 @@ type TDeleteData struct {
 type TPutData struct {
 	ID   string
 	NAME string
-}
-
-type CustomError struct {
-	Code    string
-	Message string
-}
-
-func (e *CustomError) Error() string {
-	return e.Code + ", " + e.Message
 }
 
 var Get = func(c *fiber.Ctx) error {
@@ -133,7 +125,7 @@ func CallGetData(memberId string) ([]map[string]interface{}, error) {
 		}
 	}
 	if len(memberList) == 0 {
-		return nil, &CustomError{Code: "C001", Message: "Cannot found member."}
+		return nil, errors.New("cannot found member")
 	}
 	filter = bson.M{"$or": memberList}
 	cursor, err = coll.Find(context.TODO(), filter)

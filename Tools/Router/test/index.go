@@ -1,6 +1,7 @@
 package _test
 
 import (
+	"errors"
 	_component "fiber/Tools/Router/component"
 	_component_like "fiber/Tools/Router/component/like"
 	_project "fiber/Tools/Router/project"
@@ -13,14 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type CustomError struct {
-	Message string
-}
-
-func (e *CustomError) Error() string {
-	return e.Message
-}
 
 var Test = func(c *fiber.Ctx) error {
 	err := TestCompoent()
@@ -50,7 +43,7 @@ func TestProject() error {
 	if err != nil {
 		return err
 	} else if insertedID == "" {
-		return &CustomError{Message: "Cannot create project."}
+		return errors.New("cannot create project")
 	}
 	putData := _project.TPutData{
 		ID:    insertedID,
@@ -62,7 +55,7 @@ func TestProject() error {
 	if err != nil {
 		return err
 	} else if putResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update project."}
+		return errors.New("cannot update project")
 	}
 
 	putComponentData := _project_component.TPutData{
@@ -75,7 +68,7 @@ func TestProject() error {
 	if err != nil {
 		return err
 	} else if putResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update project component."}
+		return errors.New("cannot update project component")
 	}
 
 	getResult, err := _project.CallGetData(postData.OWNER)
@@ -93,12 +86,12 @@ func TestProject() error {
 				return err
 			}
 			if deleteResult.DeletedCount == 0 {
-				return &CustomError{Message: "Cannot delete project."}
+				return errors.New("cannot delete project")
 			}
 			return nil
 		}
 	}
-	return &CustomError{Message: "Cannot get project."}
+	return errors.New("cannot get project")
 }
 
 func TestCompoent() error {
@@ -113,7 +106,7 @@ func TestCompoent() error {
 	if err != nil {
 		return err
 	} else if insertedID == "" {
-		return &CustomError{Message: "Cannot create compoent."}
+		return errors.New("cannot create compoent")
 	}
 	putData := _component.TPutData{
 		NAME:  strconv.Itoa(rand.Int()),
@@ -125,7 +118,7 @@ func TestCompoent() error {
 	if err != nil {
 		return err
 	} else if putResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update compoent."}
+		return errors.New("cannot update compoent")
 	}
 
 	putLikeData := _component_like.TPutData{
@@ -136,7 +129,7 @@ func TestCompoent() error {
 	if err != nil {
 		return err
 	} else if putLikeResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update compoent like."}
+		return errors.New("cannot update compoent like")
 	}
 	getResult, err := _component.CallGetData(putData.NAME, 0, 0)
 	if err != nil {
@@ -152,12 +145,12 @@ func TestCompoent() error {
 			if err != nil {
 				return err
 			} else if deleteResult.DeletedCount == 0 {
-				return &CustomError{Message: "Cannot delete compoent."}
+				return errors.New("cannot delete compoent")
 			}
 			return nil
 		}
 	}
-	return &CustomError{Message: "Cannot get compoent."}
+	return errors.New("cannot get compoent")
 }
 
 func TestTeam() error {
@@ -171,7 +164,7 @@ func TestTeam() error {
 	if err != nil {
 		return err
 	} else if insertedID == "" {
-		return &CustomError{Message: "Cannot create team."}
+		return errors.New("cannot create team")
 	}
 	putData := _team.TPutData{
 		ID:   insertedID,
@@ -181,7 +174,7 @@ func TestTeam() error {
 	if err != nil {
 		return err
 	} else if putResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update team."}
+		return errors.New("cannot update team")
 	}
 	putTeamData := _team_member.TPutData{
 		ID:     insertedID,
@@ -191,7 +184,7 @@ func TestTeam() error {
 	if err != nil {
 		return err
 	} else if putResult.ModifiedCount != 1 {
-		return &CustomError{Message: "Cannot update team member."}
+		return errors.New("cannot update team member")
 	}
 
 	getResult, err := _team.CallGetData(masterId)
@@ -209,10 +202,10 @@ func TestTeam() error {
 			if err != nil {
 				return err
 			} else if deleteResult.DeletedCount == 0 {
-				return &CustomError{Message: "Cannot delete team."}
+				return errors.New("cannot delete team")
 			}
 			return nil
 		}
 	}
-	return &CustomError{Message: "Cannot get team."}
+	return errors.New("cannot get team")
 }
