@@ -2,13 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	_component "fiber/Tools/Router/component"
 	_component_like "fiber/Tools/Router/component/like"
@@ -38,7 +36,6 @@ func main() {
 	if err := mongodb.ConnectDB(os.Getenv("MONGODB_URI")); err != nil {
 		log.Fatal("Error mongoDB connect")
 	}
-	fmt.Println(primitive.NewObjectID().Hex())
 
 	app.Get("/component", _component.Get)
 	app.Post("/component", _component.Post)
